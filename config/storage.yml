@@ -1,0 +1,19 @@
+test:
+  storages:
+    - name: disk1
+      path: ./storage_balancer_test/disk1
+    - name: disk2
+      path: ./storage_balancer_test/disk2
+    - name: disk3
+      path: ./storage_balancer_test/disk3
+
+development:
+  storages:
+    - name: drobo
+      path: /mnt/drobo/frogbit
+    - name: nas1
+      path: /mnt/nas1/frogbit
+    - name: home
+      path: /Users/tett23
+    - name: G
+      path: /Volumes/G

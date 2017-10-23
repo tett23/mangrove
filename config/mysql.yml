@@ -1,0 +1,15 @@
+local:
+  address: 10.0.1.110:3306
+  user: tett23
+  password: password
+  database: frogbit_development
+  protocol: tcp
+  charset: utf8mb4
+
+test:
+  address: 10.0.1.110:3306
+  user: tett23
+  password: password
+  database: frogbit_test
+  protocol: tcp
+  charset: utf8mb4

@@ -56,6 +56,10 @@ func LoadStorages() (Storages, error) {
 			Path: item.Path,
 		}
 
+		if err := os.MkdirAll(s.Path, directoryCreateMode); err != nil {
+			return ret, err
+		}
+
 		if err := s.UpdateDiskStatus(); err != nil {
 			return ret, err
 		}
@@ -91,9 +95,9 @@ func loadStorageConfig(env string) (*StorageConfig, error) {
 func (s *Storage) UpdateDiskStatus() error {
 	status, err := diskFree(s.Path)
 	if err != nil {
-		return nil
+		return errors.Wrap(err, "UpdateDiskStatus")
 	}
-	s.DiskStatus = *status
+	s.DiskStatus = status
 
 	return nil
 }
@@ -104,8 +108,8 @@ func (ss *Storages) Write(path string, data []byte) (*Storage, error) {
 		return nil, errors.Errorf("storage_balancer.Storages.Write ss(len) == 0")
 	}
 
-	sort.Slice(ss, func(i, j int) bool {
-		return (*ss)[i].DiskStatus.Free < (*ss)[j].DiskStatus.Free
+	sort.Slice(*ss, func(i, j int) bool {
+		return (*ss)[j].DiskStatus.Free < (*ss)[i].DiskStatus.Free
 	})
 
 	s, err := ss.writableStorage(data)
@@ -114,13 +118,13 @@ func (ss *Storages) Write(path string, data []byte) (*Storage, error) {
 	}
 
 	if err = s.Write(path, data); err != nil {
-		return s, err
+		return s, errors.Wrap(err, "Storage.Write Write")
 	}
 	if err = s.UpdateDiskStatus(); err != nil {
-		return s, err
+		return s, errors.Wrap(err, "Storages.Write UpdateDiskStatus")
 	}
 
-	return nil, nil
+	return s, nil
 }
 
 func (ss *Storages) writableStorage(data []byte) (*Storage, error) {
@@ -146,10 +150,10 @@ func (s *Storage) Write(path string, data []byte) error {
 	dir := filepath.Dir(abs)
 
 	if err := os.MkdirAll(dir, directoryCreateMode); err != nil {
-		return err
+		return errors.Wrapf(err, "Storage.Write MkDirAll dir=%s", dir)
 	}
-	if err := ioutil.WriteFile(path, data, fileCreateMode); err != nil {
-		return err
+	if err := ioutil.WriteFile(abs, data, fileCreateMode); err != nil {
+		return errors.Wrapf(err, "Storage.Write WriteFile")
 	}
 
 	return nil
@@ -167,6 +171,9 @@ func (s *Storage) Move(srcStorage *Storage, path string) error {
 	}
 
 	destPath := filepath.Join(s.Path, path)
+	if err := os.MkdirAll(filepath.Dir(destPath), directoryCreateMode); err != nil {
+		return err
+	}
 	if err := os.Rename(srcPath, destPath); err != nil {
 		return err
 	}
@@ -174,18 +181,18 @@ func (s *Storage) Move(srcStorage *Storage, path string) error {
 	return nil
 }
 
-func diskFree(path string) (*DiskStatus, error) {
+func diskFree(path string) (DiskStatus, error) {
+	ret := DiskStatus{}
+
 	fs := syscall.Statfs_t{}
 	err := syscall.Statfs(path, &fs)
 	if err != nil {
-		return nil, err
+		return ret, errors.Wrapf(err, "diskFree path=%s", path)
 	}
 
-	ret := DiskStatus{
-		All:  fs.Blocks * uint64(fs.Bsize),
-		Free: fs.Bfree * uint64(fs.Bsize),
-	}
+	ret.All = fs.Blocks * uint64(fs.Bsize)
+	ret.Free = fs.Bfree * uint64(fs.Bsize)
 	ret.Used = ret.All - ret.Free
 
-	return &ret, nil
+	return ret, nil
 }

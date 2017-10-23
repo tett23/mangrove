@@ -1,11 +1,11 @@
 test:
   storages:
     - name: disk1
-      path: ./storage_balancer_test/disk1
+      path: ./tmp/storage_balancer_test/disk1
     - name: disk2
-      path: ./storage_balancer_test/disk2
+      path: ./tmp/storage_balancer_test/disk2
     - name: disk3
-      path: ./storage_balancer_test/disk3
+      path: ./tmp/storage_balancer_test/disk3
 
 development:
   storages:

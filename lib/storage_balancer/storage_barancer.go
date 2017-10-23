@@ -9,6 +9,7 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/tett23/mangrove/assets"
+	"github.com/tett23/mangrove/lib/mangrove_environment"
 	yaml "gopkg.in/yaml.v2"
 )
 
@@ -44,15 +45,9 @@ const configFile = "config/storage.yml"
 func LoadStorages() (Storages, error) {
 	var ret Storages
 
-	bytes, err := assets.Asset(configFile)
+	conf, err := loadStorageConfig(mangrove_environment.Get())
 	if err != nil {
-		return ret, err
-	}
-
-	var conf StorageConfig
-	err = yaml.Unmarshal(bytes, &conf)
-	if err != nil {
-		return ret, err
+		return nil, errors.Wrap(err, "loadStorageConfig initialize error")
 	}
 
 	for _, item := range conf.Storages {
@@ -69,6 +64,27 @@ func LoadStorages() (Storages, error) {
 	}
 
 	return ret, nil
+}
+
+func loadStorageConfig(env string) (*StorageConfig, error) {
+	bytes, err := assets.Asset(configFile)
+	if err != nil {
+		return nil, errors.Wrap(err, "loadStorageConfig load asset")
+	}
+
+	var enviroments map[string]StorageConfig
+
+	err = yaml.Unmarshal(bytes, &enviroments)
+	if err != nil {
+		return nil, errors.Wrap(err, "loadStorageConfig yaml.Unmarshal")
+	}
+
+	ret, ok := enviroments[env]
+	if !ok {
+		errors.Errorf("storage_barancer.loadStorageConfig not found %s", env)
+	}
+
+	return &ret, nil
 }
 
 // UpdateDiskStatus ディスクの状態取得

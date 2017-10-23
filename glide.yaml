@@ -1,3 +1,4 @@
 package: github.com/tett23/mangrove
 import:
   - package: github.com/jinzhu/gorm
+  - package: github.com/pkg/errors

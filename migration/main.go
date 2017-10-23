@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/tett23/mangrove/lib/mangrove_db"
+	"github.com/tett23/mangrove/lib/storage_balancer"
 	"github.com/tett23/mangrove/models"
 )
 
@@ -17,4 +18,11 @@ func main() {
 		panic(err)
 	}
 	fmt.Printf("%+v\n", videos)
+
+	storages, err := storage_balancer.LoadStorages()
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Printf("%+v\n", storages)
 }

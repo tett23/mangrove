@@ -1,5 +1,5 @@
-hash: 22da9d7a99326e8cd6c0d00fc75f62df8f8badd64028600880a130298808e145
-updated: 2017-10-24T03:49:44.801341914+09:00
+hash: 1df5cfb34c6ac63bad4bbc988b122f5e4b7d01ae26620633ad1c6ba44b4bf391
+updated: 2017-10-24T04:55:15.991744952+09:00
 imports:
 - name: github.com/go-sql-driver/mysql
   version: 2e00b5cd70399450106cec6431c2e2ce3cae5034
@@ -9,6 +9,12 @@ imports:
   - dialects/mysql
 - name: github.com/jinzhu/inflection
   version: 74387dc39a75e970e7a3ae6a3386b5bd2e5c5cff
+- name: github.com/onsi/ginkgo
+  version: e185767ab450dd717718019ebe6115112af5c575
+  subpackages:
+  - ginkgo
+- name: github.com/onsi/gomega
+  version: f1f0f388b31eca4e2cbe7a6dd8a3a1dfddda5b1c
 - name: github.com/pkg/errors
   version: ff09b135c25aae272398c51a07235b90a75aa4f0
 - name: gopkg.in/yaml.v2
